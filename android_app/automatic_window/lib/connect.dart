@@ -4,46 +4,15 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:ir_sensor_plugin/ir_sensor_plugin.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatefulWidget {
+class SendSignal extends StatefulWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  _SendSignalState createState() => _SendSignalState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _SendSignalState extends State<SendSignal> {
   String _platformVersion = 'Unknown';
   bool _hasIrEmitter = false;
   String _getCarrierFrequencies = 'Unknown';
-
-  var power = [
-    169,
-    168,
-    21,
-    63,
-    21,
-    63,
-    21,
-    63,
-    21,
-    63,
-    21,
-    63,
-    21,
-    63,
-    21,
-    63,
-    21,
-    1794,
-    169,
-    168,
-    21,
-    21,
-    21,
-    3694
-  ];
 
   @override
   void initState() {
@@ -82,37 +51,24 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Center(
-          child: Column(
-            children: [
-              Container(
-                height: 15.0,
-              ),
-              Text('Running on: $_platformVersion\n'),
-              Text('Has Ir Emitter: $_hasIrEmitter\n'),
-              Text('IR Carrier Frequencies:$_getCarrierFrequencies'),
-              Container(
-                height: 15.0,
-              ),
-              RaisedButton(
-                onPressed: () async {
-                  final String result =
-                      await IrSensorPlugin.transmitListInt(list: power);
-                  debugPrint('Emitting  List Int Signal: $result');
-                },
-                child: Text('Transmitt List Int'),
-              ),
-              Container(
-                height: 15.0,
-              ),
-              FormSpecificCode(),
-            ],
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Automatic Window'),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset("assets/images/close.png",
+                width: 50, fit: BoxFit.fitHeight),
+            SizedBox(
+              height: 15.0,
+            ),
+            FormSpecificCode(),
+            Text('Running on: $_platformVersion\n'),
+            Text('Has Ir Emitter: $_hasIrEmitter\n'),
+            Text('IR Carrier Frequencies:$_getCarrierFrequencies'),
+          ],
         ),
       ),
     );
@@ -120,53 +76,33 @@ class _MyAppState extends State<MyApp> {
 }
 
 class FormSpecificCode extends StatelessWidget {
-  final _formKey = GlobalKey<FormState>();
-  final _textController = TextEditingController();
-  static const power =
-      "0000 006d 0022 0003 00a9 00a8 0015 003f 0015 003f 0015 003f 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 003f 0015 003f 0015 003f 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 003f 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0040 0015 0015 0015 003f 0015 003f 0015 003f 0015 003f 0015 003f 0015 003f 0015 0702 00a9 00a8 0015 0015 0015 0e6e";
-
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      Form(
-          key: _formKey,
-          child: Column(children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                decoration: InputDecoration(
-                  hintText: 'Write specific String code to transmit',
-                  suffixIcon: IconButton(
-                    onPressed: () => _textController.clear(),
-                    icon: Icon(Icons.clear),
-                  ),
-                ),
-                controller: _textController,
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Write the code to transmit';
-                  }
-                  return null;
-                },
-              ),
-            )
-          ])),
+      Row(
+        children: [
+          ElevatedButton(
+              child: Text("Open"),
+              onPressed: () async {
+                final String result =
+                    await IrSensorPlugin.transmitString(pattern: "1111");
+                Scaffold.of(context)
+                    .showSnackBar(SnackBar(content: Text('Opened')));
+              }),
+          Spacer(),
+          ElevatedButton(
+              child: Text("Close"),
+              onPressed: () async {
+                final String result =
+                    await IrSensorPlugin.transmitString(pattern: "0000");
+                Scaffold.of(context)
+                    .showSnackBar(SnackBar(content: Text('Closed')));
+              }),
+        ],
+      ),
       Container(
         height: 15.0,
       ),
-      RaisedButton(
-        onPressed: () async {
-          if (_formKey.currentState.validate()) {
-            final String result = await IrSensorPlugin.transmitString(
-                pattern: _textController.text);
-            if (result.contains('Emitting') && result != null) {
-              Scaffold.of(context).showSnackBar(SnackBar(
-                  content: Text('Broadcasting... ${_textController.text}')));
-            }
-          }
-        },
-        child: Text('Transmit Specific Code HEX'),
-      )
     ]);
   }
 }

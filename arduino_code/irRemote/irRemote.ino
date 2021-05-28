@@ -1,5 +1,7 @@
 #include <IRremote.h>
 
+
+//testing the remote control application
 const int RECV_PIN = 7;
 IRrecv irrecv(RECV_PIN);
 decode_results results;
