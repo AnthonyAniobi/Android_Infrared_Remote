@@ -7,8 +7,6 @@ This project is created by [Anthony Aniobi](https://github.com/AnthonyAniobi), t
 
 Unlike the bluetooth communication method is cheaper and currently the cheapest arduino communication method for android online now.
 
-This project is open for use by anyone who references this initial project.
-
 **Note:** Not all mobile devices support infrared communication. Only devices with `Lidar` Sensors support infrared communication.
 
 Here is a list of all the cell phones (and devices) that Apple produces that utilize LiDAR technology.
